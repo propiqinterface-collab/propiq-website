@@ -1288,7 +1288,7 @@ const revealObserver = new IntersectionObserver((entries) => {
 document.querySelectorAll('.reveal, .stat-item').forEach(el => revealObserver.observe(el));
 
 // ── Membership form ──────────────────────────────────────────────────
-function submitMembership() {
+async function submitMembership() {
   const email = document.getElementById('mem-email').value.trim();
   const btn   = document.getElementById('mem-btn');
   const form  = document.getElementById('mem-form');
@@ -1323,12 +1323,25 @@ function submitMembership() {
   // For now: store locally and show confirmation
   // ─────────────────────────────────────────────────────────────────
 
-  // Store email in localStorage for now
-  const members = JSON.parse(localStorage.getItem('propiq_members') || '[]');
-  if (!members.includes(email)) {
-    members.push(email);
-    localStorage.setItem('propiq_members', JSON.stringify(members));
-  }
+  // const res = await fetch('https://api.web3forms.com/submit', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    access_key: ‘c3ef0afa-e732-453b-b736-b1883094e0e8’,
+    subject: 'New PropIQ Member Signup',
+    email: email,
+    message: 'New membership request from: ' + email
+  })
+});
+
+if (res.ok) {
+  form.style.display = 'none';
+  note.style.display = 'none';
+  succ.classList.add('show');
+} else {
+  btn.textContent = 'Try Again';
+  btn.disabled = false;
+
 
   setTimeout(() => {
     form.style.display = 'none';
